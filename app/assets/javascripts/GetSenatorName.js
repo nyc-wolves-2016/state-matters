@@ -7,23 +7,7 @@ $(function() {
   .done(function(response) {
     var lat = response.results[0].geometry.location.lat
     var lng = response.results[0].geometry.location.lng
-    debugger;
   })
-
-
-
-  // $.ajax({
-  //   url: "https://www.nysenate.gov/find-my-senator?search=true&addr1=606+flatbush+ave&city=brooklyn&zip5=11225",
-  //   method: 'get',
-  //   dataType: 'text/html'
-  // })
-  // .done(function(response) {
-  // }).fail(function(response) {
-  //   response = response.responseText
-  //   var test = $.parseHTML(response)
-  //   var name = $(response).find(".c-find-my-senator--senator-link").text();
-  //   var fullName = name.replace("Create an account", "").trim()
-  // })
 
   //Assemblyman
   $.ajax({
@@ -59,6 +43,85 @@ $(function() {
     var repInfo = response.responseText;
     repInfo = $.parseJSON(repInfo.slice(41, -2));
     repInfo = repInfo.rows[0];
-    debugger;
   });
+
+  //-------------------------------------------------------------------------------------------------------------------
+
+
+
+  //practice database calls
+  //search by name and sponsored bills
+  $.ajax({
+    url: "http://legislation.nysenate.gov/api/3/bills/search?term=sponsor.member.fullName:%22Frank%20Skartados%22&key=042A2V22xkhJDsvE22rtOmKKpznUpl9Y&sort=year:DESC&limit=1000&full=true",
+    method: "GET"
+  })
+  .done(function(response) {
+    var summary = response.result.items[0].result.summary;
+    var sponsoredBillsIds = []
+    // for (i = 0; i < )
+  })
+
+  //search for a bill (by session year and ID)
+  $.ajax({
+    url: "http://legislation.nysenate.gov/api/3/bills/2015/J1567/?key=042A2V22xkhJDsvE22rtOmKKpznUpl9Y",
+    method: "GET"
+  })
+  .done(function(response) {
+
+    // var nayVotesCount = 0
+    // if (response.result.votes.items[0].memberVotes.items.NAY) {
+    //   nayVotesCount = response.result.votes.items[0].memberVotes.items.NAY.size
+    // }
+    // var ayeVotesCount = 0
+    // if (response.result.votes.items[0].memberVotes.items.AYE) {
+    //   ayeVotesCount = response.result.votes.items[0].memberVotes.items.AYE.size
+    // }
+  })
+
+  //find every bill they've voted on, then find whether they voted AYE or NAY
+
+  // find every bill in a given session with zero votes
+  $.ajax({
+    url: "http://legislation.nysenate.gov/api/3/bills/2013/search?term=votes.size:0&key=042A2V22xkhJDsvE22rtOmKKpznUpl9Y&limit=25&full=true",
+    method: "GET"
+  })
+  .done(function(response) {
+  })
+
+  // find every bill in a given year that's been voted on
+  $.ajax({
+    url: "http://legislation.nysenate.gov/api/3/bills/2015/search?term=votes.size:>0%20AND%20year:2016&key=042A2V22xkhJDsvE22rtOmKKpznUpl9Y&offset=1&limit=1000&full=true",
+    method: "GET"
+  })
+  .done(function(response) {
+    var floorVotes = response.result.items.filter(bill => bill.result.votes.items.length === 2);
+    var closeFloorVotes = floorVotes.filter(bill => bill.result.votes.items[1].memberVotes.items.AYE && bill.result.votes.items[1].memberVotes.items.NAY);
+    var closerFloorVotes = closeFloorVotes.filter(bill => Math.abs((bill.result.votes.items[1].memberVotes.items.AYE.size) - (bill.result.votes.items[1].memberVotes.items.NAY.size)) < 20 )
+
+    // closeFloorVotes === at least one vote on either side
+    // var closeFloorVotes = floorVotes.filter(bill => bill.result.votes.items[1].memberVotes.items.AYE && bill.result.votes.items[1].memberVotes.items.NAY)
+
+
+    var decision = "";
+    var senatorVotes = closerFloorVotes.map(bill => {
+      if (bill.result.votes.items[1].memberVotes.items.AYE.items.filter(senator => senator.fullName === "Kevin S. Parker").length > 0) {
+        return decision = "AYE"
+      } else {
+        return decision = "NAY"
+      };
+    })
+    debugger;
+  })
+
+
+  //search for assembly votes
+  $.ajax({
+    url: "http://legislation.nysenate.gov/api/3/bills/search?term=sponsor.member.fullName:%22Frank%20Skartados%22&key=042A2V22xkhJDsvE22rtOmKKpznUpl9Y&sort=year:DESC",
+    method: "GET"
+  })
+  .done(function(response) {
+    var summary = response.result.items[0].result.summary;
+    var sponsoredBillsIds = []
+    // for (i = 0; i < )
+  })
 });

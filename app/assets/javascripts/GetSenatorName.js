@@ -1,4 +1,5 @@
 $(function() {
+  // requires cross origin resource sharing
   $.ajax({
     url: "https://www.nysenate.gov/find-my-senator?search=true&addr1=606+flatbush+ave&city=brooklyn&zip5=11225",
     method: 'get',

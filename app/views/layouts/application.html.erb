@@ -6,9 +6,12 @@
 
     <%= stylesheet_link_tag    'application', media: 'all' %>
     <%= javascript_include_tag 'application' %>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
   </head>
 
   <body>
     <%= yield %>
+    <div id="chart_div"></div>
   </body>
 </html>

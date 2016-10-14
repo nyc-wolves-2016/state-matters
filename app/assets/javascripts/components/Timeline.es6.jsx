@@ -12,7 +12,7 @@ class Timeline extends React.Component {
 
         <section className="timeline">
           <ul>
-            {this.props.bills.map((bill, idx) => <Bill data={bill} key={idx} />)}
+            {this.props.bills.map((bill, idx) => <Bill data={bill} key={idx} supaKey={idx} othaSupaKey={idx+1000} />)}
             <li>
               <div>
                 <time>1934</time> At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium

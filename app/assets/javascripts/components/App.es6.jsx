@@ -2,6 +2,7 @@ class App extends React.Component {
   constructor() {
     super();
     this.geocodeIt = this.geocodeIt.bind(this);
+    this.getBills = this.getBills.bind(this);
     this.state = {
       repInfo: {},
       bills: [
@@ -41,6 +42,7 @@ class App extends React.Component {
       foundRep = $.parseJSON(foundRep.slice(41, -2));
       foundRep = foundRep.rows[0];
       this.setState({repInfo: foundRep});
+      this.getBills(foundRep[1])
     }.bind(this));
   }
 
@@ -56,6 +58,7 @@ class App extends React.Component {
       foundRep = foundRep.rows[0];
     });
   }
+
   getCongress(latLng) {
     $.ajax({
       url: "https://www.googleapis.com/fusiontables/v1/query?sql=SELECT%20DISTRICT%2C%20REP_NAME%2C%20REP_URL%2C%20POPULATION%20%20%20FROM%201GFWTwdhLbQ8yprvFNe-XNkrm1Ik-vPFFynaxg3g%20%20WHERE%20geometry%20not%20equal%20to%20%27%27%20AND%20ST_INTERSECTS(geometry%2C%20CIRCLE(LATLNG(" + latLng + ")%2C1))&callback=MapsLib.displayListcon&key=AIzaSyAHOjsb-JbuJn1lC6OzUNH-jlDT_KA_FwE&callback=jQuery17106865557795366708_1476457349225&_=1476457378114",
@@ -68,6 +71,39 @@ class App extends React.Component {
       foundRep = foundRep.rows[0];
     });
   }
+
+  getBills(repName) {
+    $.ajax({
+        url: "http://legislation.nysenate.gov/api/3/bills/2015/search?term=votes.size:>0%20AND%20year:2016&key=042A2V22xkhJDsvE22rtOmKKpznUpl9Y&offset=1&limit=1000&full=true",
+        method: "GET"
+    })
+    .done(function(response) {
+      // bills w/ floor votes
+      var floorVotes = response.result.items.filter(bill => bill.result.votes.items.length === 2);
+      var closeFloorVotes = floorVotes.filter(bill => bill.result.votes.items[1].memberVotes.items.AYE && bill.result.votes.items[1].memberVotes.items.NAY);
+      var closerFloorVotes = closeFloorVotes.filter(bill => Math.abs((bill.result.votes.items[1].memberVotes.items.AYE.size) - (bill.result.votes.items[1].memberVotes.items.NAY.size)) < 20 )
+
+      var decision = "";
+      var senatorVotes = closerFloorVotes.map(bill => {
+        if (bill.result.votes.items[1].memberVotes.items.AYE.items.filter(senator => senator.fullName === repName).length > 0) {
+          return decision = "AYE"
+        } else {
+          return decision = "NAY"
+        };
+      })
+      this.setState({
+        bills:
+          closerFloorVotes.map(bill => {
+            return {"title": bill.result.title,
+              "year": bill.result.year,
+              "for": bill.result.votes.items[1].memberVotes.items.AYE.size,
+              "against": bill.result.votes.items[1].memberVotes.items.NAY.size
+            }
+          })
+      })
+    }.bind(this))
+  }
+
   render() {
     return(
       <div>

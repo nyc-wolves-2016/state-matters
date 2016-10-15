@@ -94,13 +94,10 @@ $(function() {
     method: "GET"
   })
   .done(function(response) {
+    // bills w/ floor votes
     var floorVotes = response.result.items.filter(bill => bill.result.votes.items.length === 2);
     var closeFloorVotes = floorVotes.filter(bill => bill.result.votes.items[1].memberVotes.items.AYE && bill.result.votes.items[1].memberVotes.items.NAY);
     var closerFloorVotes = closeFloorVotes.filter(bill => Math.abs((bill.result.votes.items[1].memberVotes.items.AYE.size) - (bill.result.votes.items[1].memberVotes.items.NAY.size)) < 20 )
-
-    // closeFloorVotes === at least one vote on either side
-    // var closeFloorVotes = floorVotes.filter(bill => bill.result.votes.items[1].memberVotes.items.AYE && bill.result.votes.items[1].memberVotes.items.NAY)
-
 
     var decision = "";
     var senatorVotes = closerFloorVotes.map(bill => {
@@ -110,7 +107,6 @@ $(function() {
         return decision = "NAY"
       };
     })
-    debugger;
   })
 
 

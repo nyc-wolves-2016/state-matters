@@ -3,28 +3,8 @@ class App extends React.Component {
     super();
     this.geocodeIt = this.geocodeIt.bind(this);
     this.state = {
+      repInfo: {},
       bills: [
-        {
-          title: "Test Bill",
-          ayes: 43,
-          nayes: 25,
-          date: Date.now(),
-          descrip: "This is a bill its a bill bill bill."
-        },
-        {
-          title: "Test Bill2",
-          ayes: 53,
-          nayes: 45,
-          date: Date.now(),
-          descrip: "This is a bill its a bill bill bill2222."
-        },
-        {
-          title: "Test Bill3",
-          ayes: 63,
-          nayes: 15,
-          date: Date.now(),
-          descrip: "This is a bill its a bill bill bill3333."
-        }
       ]
     }
   }
@@ -57,10 +37,11 @@ class App extends React.Component {
     })
     .done(function(response) {
     }).fail(function(response) {
-      var repInfo = response.responseText;
-      repInfo = $.parseJSON(repInfo.slice(41, -2));
-      repInfo = repInfo.rows[0];
-    });
+      var foundRep = response.responseText;
+      foundRep = $.parseJSON(foundRep.slice(41, -2));
+      foundRep = foundRep.rows[0];
+      this.setState({repInfo: foundRep});
+    }.bind(this));
   }
 
   getAssembly(latLng) {
@@ -70,10 +51,9 @@ class App extends React.Component {
     })
     .done(function(response) {
     }).fail(function(response) {
-      var repInfo = response.responseText;
-      repInfo = $.parseJSON(repInfo.slice(39, -2));
-      repInfo = repInfo.rows[0];
-      debugger;
+      var foundRep = response.responseText;
+      foundRep = $.parseJSON(foundRep.slice(39, -2));
+      foundRep = foundRep.rows[0];
     });
   }
   getCongress(latLng) {
@@ -83,10 +63,9 @@ class App extends React.Component {
     })
     .done(function(response) {
     }).fail(function(response) {
-      var repInfo = response.responseText;
-      repInfo = $.parseJSON(repInfo.slice(39, -2));
-      repInfo = repInfo.rows[0];
-      debugger;
+      var foundRep = response.responseText;
+      foundRep = $.parseJSON(foundRep.slice(39, -2));
+      foundRep = foundRep.rows[0];
     });
   }
   render() {
@@ -94,6 +73,7 @@ class App extends React.Component {
       <div>
         <h2>We in dis parent-most, App component, yung stunna.</h2>
         <AddressForm getAddress={this.geocodeIt}/>
+        <RepInfoDisplay repDisplay={this.state.repInfo}/>
         <Timeline bills={this.state.bills}/>
       </div>
     )

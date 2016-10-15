@@ -28,14 +28,18 @@ class Bill extends React.Component {
   //   </div>
   //   <div id={this.props.supaKey}></div>
   // </li>
+  componentDidMount() {
+    setupListeners();
+  }
 
   render() {
-    let {year, title, supaKey, othaSupaKey} = this.props.data
+    let {year, title} = this.props.data
+    let {supaKey, othaSupaKey} = this.props
     return(
       <li id={othaSupaKey}>
-        <time>{year}</time> {title}
-        <div id={supaKey}></div>
+        <div><time>{year}</time> {title}</div>
       </li>
+
     )
   }
 }
